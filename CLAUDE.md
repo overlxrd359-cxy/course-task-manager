@@ -6,7 +6,10 @@
 
 - **用户角色**：编程初学者
 - **项目根目录**：`/Users/overlxrd/vibe coding project`
-- **应用代码**：`Course Task Manager/index.html`
+- **应用代码**：
+  - 纯前端版：`Course Task Manager/index.html`
+  - Flask 版后端：`Course Task Manager/flask-app/app.py`
+  - Flask 版前端：`Course Task Manager/flask-app/templates/index.html` + `static/`
 
 ## 标准文件路径
 
@@ -36,13 +39,23 @@
 
 ## 代码规范
 
+### 纯前端版
 - 所有代码在 `Course Task Manager/index.html` 单文件中
 - HTML、CSS、JS 分别用 `<style>` 和 `<script>` 标签内嵌
+- 数据存储：`localStorage`，key = `courseTasks`、`courseSubjectColors`
+
+### Flask 升级版
+- 后端：`Course Task Manager/flask-app/app.py`（Flask + SQLite + REST API）
+- 前端：拆分到 `templates/index.html` + `static/style.css` + `static/app.js`
+- API 格式：JSON，统一返回 `{ "ok": true/false, "data": ... }`
+- 前端通过 `fetch()` 调用 API，不再直接操作 localStorage
+- 启动命令：`cd flask-app && python app.py`，访问 `http://localhost:5050`
+
+### 通用规范
 - JavaScript 使用 ES6 语法，const/let 声明变量
 - 2 空格缩进
 - UTF-8 编码
-- 使用 `crypto.randomUUID()` 生成唯一 ID
-- 数据存储：`localStorage`，key = `courseTasks`
+- 使用 `uuid.uuid4()`（Python）生成唯一 ID
 
 ## 颜色速查
 

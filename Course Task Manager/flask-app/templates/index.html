@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>作业管理器</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <header class="header">
+    <h1 class="header-title">作业管理器</h1>
+    <p class="header-subtitle">记录并追踪你的课程作业</p>
+  </header>
+
+  <div class="toolbar">
+    <button id="btn-add" class="btn btn-primary">+ 添加作业</button>
+    <input id="search-input" class="search-input" type="text" placeholder="搜索科目或内容...">
+  </div>
+
+  <main id="task-list" class="task-list"></main>
+
+  <div id="empty-state" class="empty-state">
+    <p>还没有作业记录</p>
+    <p>点击"+ 添加作业"开始吧</p>
+  </div>
+
+  <!-- 添加作业弹窗 -->
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal">
+      <h2 class="modal-title">添加作业</h2>
+
+      <label class="form-label">科目 <span class="required">*</span></label>
+      <input id="form-subject" class="form-input" type="text" placeholder="例如：数学">
+
+      <label class="form-label">具体内容 <span class="required">*</span></label>
+      <input id="form-content" class="form-input" type="text" placeholder="例如：完成习题3.5">
+
+      <label class="form-label">截止日期 (DDL) <span class="required">*</span></label>
+      <input id="form-ddl" class="form-input" type="date">
+
+      <label class="form-label">重要性</label>
+      <select id="form-importance" class="form-input">
+        <option value="medium">中</option>
+        <option value="high">高</option>
+        <option value="low">低</option>
+      </select>
+
+      <div class="modal-actions">
+        <button id="btn-cancel" class="btn btn-secondary">取消</button>
+        <button id="btn-submit" class="btn btn-primary">确认添加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 删除确认弹窗 -->
+  <div id="confirm-overlay" class="modal-overlay">
+    <div class="modal modal-confirm">
+      <p>确定要删除这个作业吗？</p>
+      <p id="confirm-task-info" class="confirm-info"></p>
+      <div class="modal-actions">
+        <button id="btn-confirm-cancel" class="btn btn-secondary">取消</button>
+        <button id="btn-confirm-delete" class="btn btn-danger">删除</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

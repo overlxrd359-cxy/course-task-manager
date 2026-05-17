@@ -15,7 +15,46 @@
 - **ES6 JavaScript**：业务逻辑，DOM 操作，数据管理
 - **Web Storage API**：localStorage 数据持久化
 
-## 零外部依赖
+## 版本说明
+
+### 纯前端版（`index.html`）
+零外部依赖，双击打开即可使用，数据存储在 localStorage。
+
+### Flask 升级版（`flask-app/`）
+前后端分离架构，数据存储在 SQLite 数据库中，支持多设备数据不丢失。
+
+---
+
+## 后端技术栈（Flask 升级版）
+
+| 项目 | 说明 |
+|------|------|
+| 后端框架 | Python Flask 3.x |
+| 数据库 | SQLite3（文件存储于 `data/tasks.db`） |
+| 接口格式 | RESTful JSON API |
+| Python 版本 | 3.9+ |
+| 依赖 | Flask（`pip install flask`） |
+
+### API 端点
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/tasks?q=` | 获取任务列表（支持搜索，服务端排序） |
+| POST | `/api/tasks` | 添加新任务 |
+| PUT | `/api/tasks/<id>/toggle-complete` | 切换完成状态 |
+| PUT | `/api/tasks/<id>/toggle-pin` | 切换置顶状态 |
+| DELETE | `/api/tasks/<id>` | 删除任务 |
+| GET | `/api/subject-colors` | 获取科目颜色映射 |
+| POST | `/api/subject-colors` | 为科目分配颜色 |
+
+### 数据库表
+
+**tasks 表**: id, subject, content, ddl, importance, completed, pinned
+**subject_colors 表**: subject (PK), color
+
+---
+
+## 纯前端版技术栈
 
 本项目不引入任何第三方库、框架或 CDN 资源。所有代码在单个 HTML 文件中，确保离线可用、无网络依赖。
 

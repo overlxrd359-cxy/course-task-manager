@@ -11,6 +11,9 @@ Icon
 # IDE
 .idea/
 
+# SQLite databases
+*.db
+
 # Temp files
 *.tmp
 *.swp
