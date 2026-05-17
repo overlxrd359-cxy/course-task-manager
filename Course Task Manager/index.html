@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>作业管理器</title>
+  <style>
+    /* ===== 全局 ===== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --color-primary: #5B9BD5;
+      --color-primary-hover: #4A8AC4;
+      --color-bg: #F0F6FB;
+      --color-card: #FFFFFF;
+      --color-text: #2C3E50;
+      --color-text-secondary: #7F8C8D;
+      --color-border: #DCDFE6;
+      --color-high: #E74C3C;
+      --color-medium: #F39C12;
+      --color-low: #27AE60;
+      --color-danger: #E74C3C;
+      --color-danger-hover: #C0392B;
+      --radius: 8px;
+      --shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    /* ===== 标题栏 ===== */
+    .header {
+      background: var(--color-card);
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--color-border);
+      text-align: center;
+    }
+    .header-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+    .header-subtitle {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      margin-top: 4px;
+    }
+
+    /* ===== 操作栏 ===== */
+    .toolbar {
+      max-width: 640px;
+      margin: 20px auto 0;
+      padding: 0 24px;
+      display: flex;
+      gap: 12px;
+    }
+    .search-input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus {
+      border-color: var(--color-primary);
+    }
+
+    /* ===== 按钮 ===== */
+    .btn {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: var(--color-primary);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--color-primary-hover);
+    }
+    .btn-secondary {
+      background: #fff;
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
+    }
+    .btn-secondary:hover {
+      background: var(--color-bg);
+    }
+    .btn-danger {
+      background: #fff;
+      color: var(--color-danger);
+      border: 1px solid var(--color-danger);
+    }
+    .btn-danger:hover {
+      background: var(--color-danger);
+      color: #fff;
+    }
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    /* ===== 任务列表 ===== */
+    .task-list {
+      max-width: 640px;
+      margin: 16px auto 40px;
+      padding: 0 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* ===== 空状态 ===== */
+    .empty-state {
+      max-width: 640px;
+      margin: 60px auto;
+      padding: 0 24px;
+      text-align: center;
+      color: var(--color-text-secondary);
+      font-size: 14px;
+      display: none;
+    }
+    .empty-state.visible {
+      display: block;
+    }
+
+    /* ===== 任务卡片 ===== */
+    .task-card {
+      background: var(--color-card);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border-left: 4px solid transparent;
+      transition: opacity 0.2s;
+    }
+    .task-card.pinned {
+      border-left-color: var(--color-primary);
+    }
+    .task-card.completed {
+      opacity: 0.55;
+    }
+    .task-card.completed .subject-tag,
+    .task-card.completed .task-content {
+      text-decoration: line-through;
+    }
+
+    .task-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .task-content {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+    }
+    .task-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+    }
+    .task-ddl {
+      font-family: "SF Mono", "Menlo", "Monaco", monospace;
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+    .task-ddl.overdue {
+      color: var(--color-high);
+      font-weight: 600;
+    }
+    .task-pin-badge {
+      font-size: 12px;
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+
+    /* ===== 重要性标签 ===== */
+    .importance-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .importance-high {
+      background: #FDEDEC;
+      color: var(--color-high);
+    }
+    .importance-medium {
+      background: #FEF5E7;
+      color: var(--color-medium);
+    }
+    .importance-low {
+      background: #E9F7EF;
+      color: var(--color-low);
+    }
+
+    /* ===== 科目标签 ===== */
+    .subject-tag {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    /* ===== 卡片操作按钮 ===== */
+    .task-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* ===== 模态框 ===== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.visible {
+      display: flex;
+    }
+    .modal {
+      background: #fff;
+      border-radius: 12px;
+      padding: 24px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .modal-confirm {
+      max-width: 320px;
+      text-align: center;
+    }
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .form-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+    }
+    .required {
+      color: var(--color-high);
+    }
+    .form-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+      font-family: inherit;
+    }
+    .form-input:focus {
+      border-color: var(--color-primary);
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .confirm-info {
+      font-weight: 600;
+      color: var(--color-text);
+    }
+
+    /* ===== 响应式 ===== */
+    @media (max-width: 480px) {
+      .toolbar {
+        flex-direction: column;
+        padding: 0 12px;
+      }
+      .task-list {
+        padding: 0 12px;
+      }
+      .task-card {
+        padding: 12px;
+      }
+      .btn {
+        padding: 10px 14px;
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 标题栏 -->
+  <header class="header">
+    <h1 class="header-title">作业管理器</h1>
+    <p class="header-subtitle">记录并追踪你的课程作业</p>
+  </header>
+
+  <!-- 操作栏 -->
+  <div class="toolbar">
+    <button id="btn-add" class="btn btn-primary">+ 添加作业</button>
+    <input id="search-input" class="search-input" type="text" placeholder="搜索科目或内容...">
+  </div>
+
+  <!-- 任务列表 -->
+  <main id="task-list" class="task-list">
+    <!-- 动态渲染 -->
+  </main>
+
+  <!-- 空状态提示 -->
+  <div id="empty-state" class="empty-state">
+    <p>还没有作业记录</p>
+    <p>点击"+ 添加作业"开始吧</p>
+  </div>
+
+  <!-- 添加作业弹窗 -->
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal">
+      <h2 class="modal-title">添加作业</h2>
+
+      <label class="form-label">科目 <span class="required">*</span></label>
+      <input id="form-subject" class="form-input" type="text" placeholder="例如：数学">
+
+      <label class="form-label">具体内容 <span class="required">*</span></label>
+      <input id="form-content" class="form-input" type="text" placeholder="例如：完成习题3.5">
+
+      <label class="form-label">截止日期 (DDL) <span class="required">*</span></label>
+      <input id="form-ddl" class="form-input" type="date">
+
+      <label class="form-label">重要性</label>
+      <select id="form-importance" class="form-input">
+        <option value="medium">中</option>
+        <option value="high">高</option>
+        <option value="low">低</option>
+      </select>
+
+      <div class="modal-actions">
+        <button id="btn-cancel" class="btn btn-secondary">取消</button>
+        <button id="btn-submit" class="btn btn-primary">确认添加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 删除确认弹窗 -->
+  <div id="confirm-overlay" class="modal-overlay">
+    <div class="modal modal-confirm">
+      <p>确定要删除这个作业吗？</p>
+      <p id="confirm-task-info" class="confirm-info"></p>
+      <div class="modal-actions">
+        <button id="btn-confirm-cancel" class="btn btn-secondary">取消</button>
+        <button id="btn-confirm-delete" class="btn btn-danger">删除</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== 数据模型 =====
+    const STORAGE_KEY = 'courseTasks';
+    const COLORS_KEY = 'courseSubjectColors';
+
+    // 科目颜色调色盘
+    const SUBJECT_PALETTE = [
+      '#5B9BD5', '#E74C3C', '#27AE60', '#F39C12',
+      '#8E44AD', '#1ABC9C', '#E67E22', '#3498DB',
+      '#2ECC71', '#9B59B6', '#16A085', '#D35400',
+    ];
+
+    function loadSubjectColors() {
+      try {
+        const raw = localStorage.getItem(COLORS_KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch {
+        return {};
+      }
+    }
+
+    function saveSubjectColors(colors) {
+      localStorage.setItem(COLORS_KEY, JSON.stringify(colors));
+    }
+
+    let subjectColors = loadSubjectColors();
+
+    function getSubjectColor(subject) {
+      if (!subjectColors[subject]) {
+        const used = Object.values(subjectColors);
+        const available = SUBJECT_PALETTE.filter(c => !used.includes(c));
+        subjectColors[subject] = available.length > 0
+          ? available[0]
+          : SUBJECT_PALETTE[Object.keys(subjectColors).length % SUBJECT_PALETTE.length];
+        saveSubjectColors(subjectColors);
+      }
+      return subjectColors[subject];
+    }
+
+    function loadTasks() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveTasks(tasks) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    }
+
+    let tasks = loadTasks();
+
+    // ===== DOM 引用 =====
+    const taskList = document.getElementById('task-list');
+    const emptyState = document.getElementById('empty-state');
+    const searchInput = document.getElementById('search-input');
+    const btnAdd = document.getElementById('btn-add');
+
+    // 添加弹窗
+    const modalOverlay = document.getElementById('modal-overlay');
+    const formSubject = document.getElementById('form-subject');
+    const formContent = document.getElementById('form-content');
+    const formDdl = document.getElementById('form-ddl');
+    const formImportance = document.getElementById('form-importance');
+    const btnSubmit = document.getElementById('btn-submit');
+    const btnCancel = document.getElementById('btn-cancel');
+
+    // 删除确认弹窗
+    const confirmOverlay = document.getElementById('confirm-overlay');
+    const confirmTaskInfo = document.getElementById('confirm-task-info');
+    const btnConfirmDelete = document.getElementById('btn-confirm-delete');
+    const btnConfirmCancel = document.getElementById('btn-confirm-cancel');
+
+    let deleteTargetId = null;
+
+    // ===== 排序 =====
+    function sortTasks(list) {
+      return [...list].sort((a, b) => {
+        if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+        if (a.completed !== b.completed) return a.completed ? 1 : -1;
+        return a.ddl.localeCompare(b.ddl);
+      });
+    }
+
+    // ===== 搜索 =====
+    function filterTasks(list, query) {
+      const q = query.toLowerCase().trim();
+      if (!q) return list;
+      return list.filter(t =>
+        t.subject.toLowerCase().includes(q) ||
+        t.content.toLowerCase().includes(q)
+      );
+    }
+
+    function getFilteredTasks() {
+      const query = searchInput.value;
+      return filterTasks(tasks, query);
+    }
+
+    // ===== 渲染 =====
+    function isOverdue(ddl) {
+      if (!ddl) return false;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const due = new Date(ddl + 'T00:00:00');
+      return due < today;
+    }
+
+    function formatDate(ddl) {
+      if (!ddl) return '';
+      const d = new Date(ddl + 'T00:00:00');
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const week = ['日','一','二','三','四','五','六'][d.getDay()];
+      return `${y}-${m}-${day} (周${week})`;
+    }
+
+    function importanceLabel(level) {
+      const map = { high: '高', medium: '中', low: '低' };
+      return map[level] || '中';
+    }
+
+    function renderTaskList() {
+      const filtered = getFilteredTasks();
+      const sorted = sortTasks(filtered);
+
+      if (sorted.length === 0) {
+        taskList.innerHTML = '';
+        emptyState.classList.add('visible');
+        return;
+      }
+
+      emptyState.classList.remove('visible');
+      taskList.innerHTML = sorted.map(t => {
+        const overdue = !t.completed && isOverdue(t.ddl);
+        return `
+          <div class="task-card ${t.pinned ? 'pinned' : ''} ${t.completed ? 'completed' : ''}" data-id="${t.id}">
+            <div class="task-top-row">
+              <span class="subject-tag" style="background:${getSubjectColor(t.subject)};">${escapeHtml(t.subject)}</span>
+              <span class="importance-tag importance-${t.importance}">${importanceLabel(t.importance)}</span>
+            </div>
+            <div class="task-content">${escapeHtml(t.content)}</div>
+            <div class="task-meta">
+              <span class="task-ddl ${overdue ? 'overdue' : ''}">DDL: ${formatDate(t.ddl)}${overdue ? ' (已过期)' : ''}</span>
+              ${t.pinned ? '<span class="task-pin-badge">置顶</span>' : ''}
+            </div>
+            <div class="task-actions">
+              <button class="btn btn-sm btn-secondary btn-toggle-complete" data-id="${t.id}">
+                ${t.completed ? '撤销' : '完成'}
+              </button>
+              <button class="btn btn-sm btn-secondary btn-toggle-pin" data-id="${t.id}">
+                ${t.pinned ? '取消置顶' : '置顶'}
+              </button>
+              <button class="btn btn-sm btn-danger btn-delete-task" data-id="${t.id}">删除</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // 绑定事件
+      taskList.querySelectorAll('.btn-toggle-complete').forEach(btn => {
+        btn.addEventListener('click', () => toggleComplete(btn.dataset.id));
+      });
+      taskList.querySelectorAll('.btn-toggle-pin').forEach(btn => {
+        btn.addEventListener('click', () => togglePin(btn.dataset.id));
+      });
+      taskList.querySelectorAll('.btn-delete-task').forEach(btn => {
+        btn.addEventListener('click', () => showDeleteConfirm(btn.dataset.id));
+      });
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ===== 操作函数 =====
+    function addTask(task) {
+      tasks.push({
+        id: crypto.randomUUID(),
+        subject: task.subject,
+        content: task.content,
+        ddl: task.ddl,
+        importance: task.importance || 'medium',
+        completed: false,
+        pinned: false,
+      });
+      saveTasks(tasks);
+      renderTaskList();
+    }
+
+    function toggleComplete(id) {
+      const t = tasks.find(t => t.id === id);
+      if (t) {
+        t.completed = !t.completed;
+        saveTasks(tasks);
+        renderTaskList();
+      }
+    }
+
+    function togglePin(id) {
+      const t = tasks.find(t => t.id === id);
+      if (t) {
+        t.pinned = !t.pinned;
+        saveTasks(tasks);
+        renderTaskList();
+      }
+    }
+
+    function deleteTask(id) {
+      tasks = tasks.filter(t => t.id !== id);
+      saveTasks(tasks);
+      renderTaskList();
+    }
+
+    // ===== 弹窗控制 =====
+    function openModal() {
+      formSubject.value = '';
+      formContent.value = '';
+      formDdl.value = '';
+      formImportance.value = 'medium';
+      modalOverlay.classList.add('visible');
+      formSubject.focus();
+    }
+
+    function closeModal() {
+      modalOverlay.classList.remove('visible');
+    }
+
+    function showDeleteConfirm(id) {
+      deleteTargetId = id;
+      const t = tasks.find(t => t.id === id);
+      if (t) {
+        confirmTaskInfo.textContent = `${t.subject} - ${t.content}`;
+      }
+      confirmOverlay.classList.add('visible');
+    }
+
+    function hideDeleteConfirm() {
+      confirmOverlay.classList.remove('visible');
+      deleteTargetId = null;
+    }
+
+    // ===== 表单验证 =====
+    function validateForm() {
+      let ok = true;
+      if (!formSubject.value.trim()) ok = false;
+      if (!formContent.value.trim()) ok = false;
+      if (!formDdl.value) ok = false;
+      return ok;
+    }
+
+    // ===== 事件监听 =====
+    btnAdd.addEventListener('click', openModal);
+    btnCancel.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) closeModal();
+    });
+
+    btnSubmit.addEventListener('click', () => {
+      if (!validateForm()) {
+        alert('请填写科目、具体内容和截止日期');
+        return;
+      }
+      addTask({
+        subject: formSubject.value.trim(),
+        content: formContent.value.trim(),
+        ddl: formDdl.value,
+        importance: formImportance.value,
+      });
+      closeModal();
+    });
+
+    btnConfirmCancel.addEventListener('click', hideDeleteConfirm);
+    confirmOverlay.addEventListener('click', (e) => {
+      if (e.target === confirmOverlay) hideDeleteConfirm();
+    });
+    btnConfirmDelete.addEventListener('click', () => {
+      if (deleteTargetId) {
+        deleteTask(deleteTargetId);
+        hideDeleteConfirm();
+      }
+    });
+
+    searchInput.addEventListener('input', renderTaskList);
+
+    // 键盘快捷键：Enter 提交添加，Esc 关闭弹窗
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (confirmOverlay.classList.contains('visible')) {
+          hideDeleteConfirm();
+        } else if (modalOverlay.classList.contains('visible')) {
+          closeModal();
+        }
+      }
+      if (e.key === 'Enter' && modalOverlay.classList.contains('visible')) {
+        btnSubmit.click();
+      }
+    });
+
+    // ===== 初始渲染 =====
+    renderTaskList();
+  </script>
+
+</body>
+</html>
