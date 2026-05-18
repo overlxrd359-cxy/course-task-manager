@@ -8,23 +8,25 @@ A clean and intuitive web app for managing course assignments and tracking their
 
 ## 功能介绍 / Features
 
-| 功能 | Feature |
-|------|---------|
+| 功能                                | Feature                                             |
+| ----------------------------------- | --------------------------------------------------- |
 | 添加作业（科目、内容、DDL、重要性） | Add assignments (subject, content, DDL, importance) |
-| 按 DDL 升序排列，置顶优先 | Sorted by DDL ascending, pinned items first |
-| 标记完成 / 未完成 | Mark as complete / incomplete |
-| 置顶 / 取消置顶 | Pin / unpin assignments |
-| 搜索过滤 | Search and filter |
-| 本地数据持久化 | Local data persistence (localStorage) |
+| 按 DDL 升序排列，置顶优先           | Sorted by DDL ascending, pinned items first         |
+| 标记完成 / 未完成                   | Mark as complete / incomplete                       |
+| 置顶 / 取消置顶                     | Pin / unpin assignments                             |
+| 搜索过滤                            | Search and filter                                   |
+| 本地数据持久化                      | Local data persistence (localStorage)               |
 
 ## 使用方法 / How to Use
 
 ### 纯前端版（零依赖，双击即用）
+
 1. 下载或克隆本项目 / Download or clone this project
 2. 用浏览器打开 `Course Task Manager/index.html` / Open `Course Task Manager/index.html` in your browser
 3. 开始添加作业 / Start adding assignments
 
 ### Flask 升级版（后端 + 数据库）
+
 ```bash
 cd "Course Task Manager/flask-app"
 pip install flask              # 仅需一次
@@ -35,11 +37,13 @@ python app.py                  # 启动服务器
 ## 技术栈 / Tech Stack
 
 ### 纯前端版
+
 - 纯 HTML5 + CSS3 + JavaScript (ES6)
 - 零外部依赖 / Zero external dependencies
 - 浏览器本地存储 / Browser localStorage
 
 ### Flask 升级版
+
 - Python Flask + SQLite
 - RESTful JSON API
 - 前后端分离架构 / Frontend-backend separation
@@ -67,4 +71,4 @@ python app.py                  # 启动服务器
 
 ## 许可证 / License
 
-MIT
+MIT自由部署

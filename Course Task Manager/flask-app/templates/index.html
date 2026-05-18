@@ -8,63 +8,115 @@
 </head>
 <body>
 
-  <header class="header">
-    <h1 class="header-title">作业管理器</h1>
-    <p class="header-subtitle">记录并追踪你的课程作业</p>
-  </header>
+<div class="app-layout">
 
-  <div class="toolbar">
-    <button id="btn-add" class="btn btn-primary">+ 添加作业</button>
-    <input id="search-input" class="search-input" type="text" placeholder="搜索科目或内容...">
-  </div>
+  <!-- ===== 侧边栏 ===== -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h1 class="sidebar-title">📚 作业管理器</h1>
+    </div>
 
-  <main id="task-list" class="task-list"></main>
+    <div class="sidebar-section">
+      <input id="search-input" class="search-input" type="text" placeholder="🔍 搜索作业...">
+    </div>
 
-  <div id="empty-state" class="empty-state">
-    <p>还没有作业记录</p>
-    <p>点击"+ 添加作业"开始吧</p>
-  </div>
+    <div class="sidebar-section">
+      <span class="section-label">⚙ 展示</span>
+      <label class="toggle-row">
+        <input type="checkbox" id="filter-group-by">
+        按科目分组
+      </label>
+    </div>
 
-  <!-- 添加作业弹窗 -->
-  <div id="modal-overlay" class="modal-overlay">
-    <div class="modal">
-      <h2 class="modal-title">添加作业</h2>
+    <div class="sidebar-section">
+      <span class="section-label">📊 状态</span>
+      <label class="filter-option"><input type="radio" name="status" value="all" checked> 全部</label>
+      <label class="filter-option"><input type="radio" name="status" value="incomplete"> 📝 未完成</label>
+      <label class="filter-option"><input type="radio" name="status" value="completed"> ✅ 已完成</label>
+    </div>
 
-      <label class="form-label">科目 <span class="required">*</span></label>
-      <input id="form-subject" class="form-input" type="text" placeholder="例如：数学">
+    <div class="sidebar-section">
+      <span class="section-label">🔥 重要性</span>
+      <label class="filter-option"><input type="checkbox" class="filter-importance" value="high"> 🔥 高</label>
+      <label class="filter-option"><input type="checkbox" class="filter-importance" value="medium"> ⚡ 中</label>
+      <label class="filter-option"><input type="checkbox" class="filter-importance" value="low"> 🌱 低</label>
+    </div>
 
-      <label class="form-label">具体内容 <span class="required">*</span></label>
-      <input id="form-content" class="form-input" type="text" placeholder="例如：完成习题3.5">
+    <div class="sidebar-section">
+      <span class="section-label">📂 科目</span>
+      <div id="subject-filter-list"></div>
+    </div>
 
-      <label class="form-label">截止日期 (DDL) <span class="required">*</span></label>
-      <input id="form-ddl" class="form-input" type="date">
+    <button id="btn-add" class="btn btn-primary btn-sidebar-add">➕ 添加作业</button>
+  </aside>
 
-      <label class="form-label">重要性</label>
-      <select id="form-importance" class="form-input">
-        <option value="medium">中</option>
-        <option value="high">高</option>
-        <option value="low">低</option>
-      </select>
+  <!-- ===== 主内容区 ===== -->
+  <main class="main-content">
+    <div id="task-list" class="task-list"></div>
+    <div id="empty-state" class="empty-state">
+      <p>📋 还没有作业记录</p>
+      <p>点击 "➕ 添加作业" 开始吧</p>
+    </div>
+  </main>
 
-      <div class="modal-actions">
-        <button id="btn-cancel" class="btn btn-secondary">取消</button>
-        <button id="btn-submit" class="btn btn-primary">确认添加</button>
-      </div>
+</div>
+
+<!-- 添加作业弹窗 -->
+<div id="modal-overlay" class="modal-overlay">
+  <div class="modal">
+    <h2 class="modal-title">添加作业</h2>
+
+    <label class="form-label">科目 <span class="required">*</span></label>
+    <input id="form-subject" class="form-input" type="text" placeholder="例如：数学">
+
+    <label class="form-label">具体内容 <span class="required">*</span></label>
+    <input id="form-content" class="form-input" type="text" placeholder="例如：完成习题3.5">
+
+    <label class="form-label">截止日期 (DDL) <span class="required">*</span></label>
+    <input id="form-ddl" class="form-input" type="date">
+
+    <label class="form-label">重要性</label>
+    <select id="form-importance" class="form-input">
+      <option value="medium">中</option>
+      <option value="high">高</option>
+      <option value="low">低</option>
+    </select>
+
+    <label class="form-label">作业图片（可选）</label>
+    <input id="form-image" class="form-input" type="file" accept="image/*">
+    <div id="image-preview" class="image-preview"></div>
+
+    <div class="modal-actions">
+      <button id="btn-cancel" class="btn btn-secondary">取消</button>
+      <button id="btn-submit" class="btn btn-primary">确认添加</button>
     </div>
   </div>
+</div>
 
-  <!-- 删除确认弹窗 -->
-  <div id="confirm-overlay" class="modal-overlay">
-    <div class="modal modal-confirm">
-      <p>确定要删除这个作业吗？</p>
-      <p id="confirm-task-info" class="confirm-info"></p>
-      <div class="modal-actions">
-        <button id="btn-confirm-cancel" class="btn btn-secondary">取消</button>
-        <button id="btn-confirm-delete" class="btn btn-danger">删除</button>
-      </div>
+<!-- 删除确认弹窗 -->
+<div id="confirm-overlay" class="modal-overlay">
+  <div class="modal modal-confirm">
+    <p>确定要删除这个作业吗？</p>
+    <p id="confirm-task-info" class="confirm-info"></p>
+    <div class="modal-actions">
+      <button id="btn-confirm-cancel" class="btn btn-secondary">取消</button>
+      <button id="btn-confirm-delete" class="btn btn-danger">删除</button>
     </div>
   </div>
+</div>
 
-  <script src="{{ url_for('static', filename='app.js') }}"></script>
+<!-- DDL 过期确认弹窗 -->
+<div id="overdue-overlay" class="modal-overlay">
+  <div class="modal modal-confirm">
+    <p>⚠️ 该作业已截止</p>
+    <p id="overdue-task-info" class="confirm-info"></p>
+    <div class="modal-actions">
+      <button id="btn-overdue-cancel" class="btn btn-secondary">取消</button>
+      <button id="btn-overdue-confirm" class="btn btn-primary">仍要添加</button>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

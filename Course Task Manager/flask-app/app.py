@@ -1,10 +1,15 @@
 import sqlite3
 import os
+import uuid
+from datetime import date, timedelta
 from flask import Flask, g, jsonify, request, render_template
 
 app = Flask(__name__)
 
 DATABASE = os.path.join(os.path.dirname(__file__), 'data', 'tasks.db')
+UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
+ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif', 'webp'}
+MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5MB
 
 SUBJECT_PALETTE = [
     '#5B9BD5', '#E74C3C', '#27AE60', '#F39C12',
@@ -49,8 +54,15 @@ def init_db():
             color   TEXT NOT NULL
         )
     ''')
+    # 迁移：添加 image 列
+    try:
+        db.execute('ALTER TABLE tasks ADD COLUMN image TEXT DEFAULT \'\'')
+    except sqlite3.OperationalError:
+        pass
     db.commit()
     db.close()
+
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
 def task_from_row(row):
@@ -62,6 +74,7 @@ def task_from_row(row):
         'importance': row['importance'],
         'completed': bool(row['completed']),
         'pinned': bool(row['pinned']),
+        'image': row['image'] if 'image' in row.keys() else '',
     }
 
 
@@ -105,7 +118,17 @@ def create_task():
     if not subject or not content or not ddl:
         return jsonify({'ok': False, 'error': '科目、内容和截止日期为必填项'}), 400
 
-    import uuid
+    # DDL 日期校验
+    try:
+        ddl_date = date.fromisoformat(ddl)
+    except (ValueError, TypeError):
+        return jsonify({'ok': False, 'error': '截止日期格式无效'}), 400
+
+    today = date.today()
+    max_date = today + timedelta(days=365 * 100)
+    if ddl_date > max_date:
+        return jsonify({'ok': False, 'error': '截止日期超出范围（最多100年）'}), 400
+
     task_id = str(uuid.uuid4())
 
     db = get_db()
@@ -159,6 +182,43 @@ def delete_task(task_id):
     db.execute('DELETE FROM tasks WHERE id = ?', (task_id,))
     db.commit()
     return jsonify({'ok': True}), 200
+
+
+def allowed_image(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@app.route('/api/tasks/<task_id>/image', methods=['POST'])
+def upload_task_image(task_id):
+    db = get_db()
+    task = db.execute('SELECT * FROM tasks WHERE id = ?', (task_id,)).fetchone()
+    if not task:
+        return jsonify({'ok': False, 'error': '任务不存在'}), 404
+
+    if 'image' not in request.files:
+        return jsonify({'ok': False, 'error': '未选择图片'}), 400
+
+    file = request.files['image']
+    if not file or file.filename == '':
+        return jsonify({'ok': False, 'error': '未选择图片'}), 400
+
+    if not allowed_image(file.filename):
+        return jsonify({'ok': False, 'error': '仅允许 jpg/png/gif/webp 格式'}), 400
+
+    file.seek(0, os.SEEK_END)
+    size = file.tell()
+    file.seek(0)
+    if size > MAX_IMAGE_SIZE:
+        return jsonify({'ok': False, 'error': '图片大小不能超过 5MB'}), 400
+
+    ext = file.filename.rsplit('.', 1)[1].lower()
+    filename = str(uuid.uuid4()) + '.' + ext
+    file.save(os.path.join(UPLOAD_FOLDER, filename))
+
+    db.execute('UPDATE tasks SET image = ? WHERE id = ?', (filename, task_id))
+    db.commit()
+
+    return jsonify({'ok': True, 'data': filename})
 
 
 @app.route('/api/subject-colors', methods=['GET'])
