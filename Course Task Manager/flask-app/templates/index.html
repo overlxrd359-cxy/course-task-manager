@@ -8,54 +8,58 @@
 </head>
 <body>
 
-<div class="app-layout">
+<div class="flex min-h-screen">
 
   <!-- ===== 侧边栏 ===== -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <h1 class="sidebar-title">📚 作业管理器</h1>
+  <aside class="w-[220px] flex-shrink-0 bg-card border-r border-border px-4 py-6 flex flex-col gap-[18px] sticky top-0 h-screen overflow-y-auto z-10 max-[768px]:w-full max-[768px]:h-auto max-[768px]:static max-[768px]:border-r-0 max-[768px]:border-b max-[768px]:p-4 max-[768px]:gap-3">
+
+    <div class="text-center pb-3 border-b border-border bg-gradient-to-b from-primary/5 to-transparent -mx-4 px-4 pt-2">
+      <h1 class="text-lg font-bold text-primary">📚 作业管理器</h1>
     </div>
 
-    <div class="sidebar-section">
+    <div class="flex flex-col gap-[6px]">
       <input id="search-input" class="search-input" type="text" placeholder="🔍 搜索作业...">
     </div>
 
-    <div class="sidebar-section">
+    <div class="flex flex-col gap-[6px]">
       <span class="section-label">⚙ 展示</span>
       <label class="toggle-row">
-        <input type="checkbox" id="filter-group-by">
+        <input type="checkbox" id="filter-group-by" class="accent-primary">
         按科目分组
       </label>
     </div>
 
-    <div class="sidebar-section">
+    <div class="flex flex-col gap-[6px]">
       <span class="section-label">📊 状态</span>
       <label class="filter-option"><input type="radio" name="status" value="all" checked> 全部</label>
       <label class="filter-option"><input type="radio" name="status" value="incomplete"> 📝 未完成</label>
       <label class="filter-option"><input type="radio" name="status" value="completed"> ✅ 已完成</label>
     </div>
 
-    <div class="sidebar-section">
+    <div class="flex flex-col gap-[6px]">
       <span class="section-label">🔥 重要性</span>
       <label class="filter-option"><input type="checkbox" class="filter-importance" value="high"> 🔥 高</label>
       <label class="filter-option"><input type="checkbox" class="filter-importance" value="medium"> ⚡ 中</label>
       <label class="filter-option"><input type="checkbox" class="filter-importance" value="low"> 🌱 低</label>
     </div>
 
-    <div class="sidebar-section">
+    <div class="flex flex-col gap-[6px]">
       <span class="section-label">📂 科目</span>
-      <div id="subject-filter-list"></div>
+      <div id="subject-filter-list" class="flex flex-col gap-1"></div>
     </div>
 
-    <button id="btn-add" class="btn btn-primary btn-sidebar-add">➕ 添加作业</button>
+    <button id="btn-add" class="btn btn-primary mt-auto max-[768px]:mt-1">➕ 添加作业</button>
   </aside>
 
   <!-- ===== 主内容区 ===== -->
-  <main class="main-content">
-    <div id="task-list" class="task-list"></div>
-    <div id="empty-state" class="empty-state">
-      <p>📋 还没有作业记录</p>
-      <p>点击 "➕ 添加作业" 开始吧</p>
+  <main class="flex-1 overflow-y-auto">
+    <div id="stats-bar" class="grid grid-cols-3 gap-3 max-w-[720px] mx-auto px-6 pt-5 pb-1 max-[480px]:grid-cols-2 max-[480px]:px-3"></div>
+    <div id="task-list" class="max-w-[720px] mx-auto px-6 py-2 pb-10 flex flex-col gap-[10px] max-[480px]:px-3"></div>
+    <div id="empty-state" class="hidden max-w-[720px] mx-auto mt-20 px-6 text-center text-text-secondary text-sm max-[480px]:px-3">
+      <div class="text-5xl mb-4">📚 ✨</div>
+      <p class="text-base font-medium text-text-primary mb-2">还没有作业记录</p>
+      <p class="text-sm">点击左侧「➕ 添加作业」</p>
+      <p class="text-sm">开始管理你的课程吧！</p>
     </div>
   </main>
 
@@ -88,7 +92,7 @@
 
     <div class="modal-actions">
       <button id="btn-cancel" class="btn btn-secondary">取消</button>
-      <button id="btn-submit" class="btn btn-primary">确认添加</button>
+      <button id="btn-submit" class="btn btn-primary active:scale-95">确认添加</button>
     </div>
   </div>
 </div>
@@ -100,7 +104,7 @@
     <p id="confirm-task-info" class="confirm-info"></p>
     <div class="modal-actions">
       <button id="btn-confirm-cancel" class="btn btn-secondary">取消</button>
-      <button id="btn-confirm-delete" class="btn btn-danger">删除</button>
+      <button id="btn-confirm-delete" class="btn btn-danger active:scale-95">删除</button>
     </div>
   </div>
 </div>
@@ -112,7 +116,7 @@
     <p id="overdue-task-info" class="confirm-info"></p>
     <div class="modal-actions">
       <button id="btn-overdue-cancel" class="btn btn-secondary">取消</button>
-      <button id="btn-overdue-confirm" class="btn btn-primary">仍要添加</button>
+      <button id="btn-overdue-confirm" class="btn btn-primary active:scale-95">仍要添加</button>
     </div>
   </div>
 </div>

@@ -1,0 +1,175 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    @apply bg-bg text-text-primary text-sm leading-relaxed;
+  }
+}
+
+@layer components {
+  /* 任务卡片 */
+  .task-card {
+    @apply bg-card rounded-lg p-4 shadow-sm flex flex-col gap-2 border-l-4 border-l-transparent;
+  }
+  .task-card.pinned {
+    @apply border-l-primary;
+  }
+  .task-card.completed {
+    @apply opacity-55;
+  }
+  .task-card.completed .subject-tag,
+  .task-card.completed .task-content {
+    @apply line-through;
+  }
+
+  /* 重要性标签 */
+  .importance-tag {
+    @apply inline-block px-2 py-0.5 rounded-[10px] text-[11px] font-semibold;
+  }
+  .importance-high {
+    background: #FDEDEC;
+    @apply text-high;
+  }
+  .importance-medium {
+    background: #FEF5E7;
+    @apply text-medium;
+  }
+  .importance-low {
+    background: #E9F7EF;
+    @apply text-low;
+  }
+
+  /* 科目标签 */
+  .subject-tag {
+    @apply inline-block px-3 py-1 rounded text-[13px] font-semibold text-white;
+  }
+
+  /* 按钮 */
+  .btn {
+    @apply px-[18px] py-[10px] rounded-md text-sm font-medium cursor-pointer transition-all duration-200 whitespace-nowrap border-none;
+  }
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary-hover;
+  }
+  .btn-secondary {
+    @apply bg-white text-text-primary border border-border hover:bg-bg;
+  }
+  .btn-danger {
+    @apply bg-white text-danger border border-danger hover:bg-danger hover:text-white;
+  }
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+
+  /* 表单 */
+  .form-input {
+    @apply w-full px-3 py-2.5 border border-border rounded-md text-sm outline-none font-sans focus:border-primary;
+  }
+  .form-label {
+    @apply text-[13px] font-medium text-text-secondary;
+  }
+
+  /* 模态框 */
+  .modal-overlay {
+    @apply hidden fixed inset-0 z-[100] items-center justify-center;
+    background: rgba(0, 0, 0, 0.4);
+  }
+  .modal-overlay.visible {
+    @apply flex;
+  }
+  .modal {
+    @apply bg-white rounded-xl p-6 w-[90%] max-w-[400px] flex flex-col gap-3;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  }
+  .modal-confirm {
+    @apply max-w-[320px] text-center;
+  }
+  .modal-title {
+    @apply text-lg font-semibold;
+  }
+  .modal-actions {
+    @apply flex justify-end gap-2 mt-1;
+  }
+
+  /* 图片预览 */
+  .image-preview {
+    @apply hidden mt-1;
+  }
+  .image-preview.visible {
+    @apply block;
+  }
+  .image-preview img {
+    @apply w-full max-h-[200px] object-contain rounded-md;
+  }
+  .task-image {
+    @apply w-full max-h-[200px] object-contain rounded-md cursor-pointer mt-1;
+  }
+
+  /* DDL */
+  .task-ddl {
+    @apply text-xs text-text-secondary;
+    font-family: "SF Mono", "Menlo", "Monaco", monospace;
+  }
+  .task-ddl.overdue {
+    @apply text-high font-semibold;
+  }
+
+  /* 搜索 */
+  .search-input {
+    @apply w-full px-3 py-2 border border-border rounded-md text-[13px] outline-none transition-colors duration-200 focus:border-primary;
+  }
+
+  /* 统计卡片 */
+  .stat-card {
+    @apply bg-card rounded-lg p-3 cursor-pointer border-l-4 border-l-transparent shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98];
+  }
+  .stat-card.active {
+    @apply border-l-primary bg-primary/5;
+  }
+
+  /* 侧边栏筛选选项 */
+  .filter-option {
+    @apply flex items-center gap-2 text-[13px] cursor-pointer px-1 py-[3px] rounded transition-colors duration-150 hover:bg-bg;
+  }
+  .filter-option input[type="checkbox"],
+  .filter-option input[type="radio"] {
+    accent-color: #5B9BD5;
+  }
+
+  /* 科目筛选项 */
+  .subject-filter-item {
+    @apply flex items-center gap-2 text-[13px] cursor-pointer px-1 py-[3px] rounded transition-colors duration-150 hover:bg-bg;
+  }
+
+  /* 侧边栏 */
+  .section-label {
+    @apply text-[11px] font-semibold text-text-secondary tracking-[0.5px] mb-0.5;
+  }
+
+  /* 分组标题 */
+  .subject-group-header {
+    @apply text-[15px] font-bold pt-5 pb-1.5 px-1;
+  }
+
+  /* 切换行 */
+  .toggle-row {
+    @apply flex items-center gap-2 text-[13px] cursor-pointer;
+  }
+
+  /* 确认信息 */
+  .confirm-info {
+    @apply font-semibold text-text-primary;
+  }
+  .required {
+    @apply text-high;
+  }
+  .content-text {
+    @apply text-sm text-text-secondary;
+  }
+  .pin-badge {
+    @apply text-xs text-primary font-semibold;
+  }
+}
