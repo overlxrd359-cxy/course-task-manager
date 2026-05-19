@@ -71,4 +71,4 @@ python app.py                  # 启动服务器
 
 ## 许可证 / License
 
-MIT自由部署
+[MIT](LICENSE)
